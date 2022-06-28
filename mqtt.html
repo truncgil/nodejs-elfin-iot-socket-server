@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/mqtt@4.0.1/dist/mqtt.js"></script>
+<script>
+const options = {
+  // Clean session
+  clean: true,
+  connectTimeout: 4000,
+  // Auth
+  clientId: 'emqx_test',
+  username: 'deneme',
+  password: '6Kv#rRu8zQcDhrHa',
+}
+const client  = mqtt.connect('wss:0f8c57bbc43f4a8dbf491ab3810e6acf.s1.eu.hivemq.cloud:8884/mqtt', options)
+client.on('connect', function () {
+  console.log('Connected')
+  client.subscribe('test', function (err) {
+    if (!err) {
+      client.publish('test', 'Hello mqtt')
+    }
+  })
+})
+
+client.on('message', function (topic, message) {
+  // message is Buffer
+  console.log(message.toString())
+  client.end()
+})
+</script>
+</head>
+<body>
+    
+</body>
+</html>
