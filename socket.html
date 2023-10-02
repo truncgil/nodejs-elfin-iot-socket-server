@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
     <title>Client</title>
     <script>
-        var socket = io('http://app.olimpiyat.com.tr:1988');
+        var socket = io('http://app.olimpiyat.com.tr:3000');
         socket.on('messages', function(data){
             console.log(data);
         });

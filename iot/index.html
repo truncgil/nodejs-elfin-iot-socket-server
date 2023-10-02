@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>TCP chat web client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <style type="text/css">
+        body {
+            color: #fff;
+        }
+        
+        #txt {
+            background-color: #000;
+            color: green;
+        }
+        
+        #inp {
+            background-color: #000;
+            border-color: green;
+            color: green;
+        }
+    </style>
+
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var socket = io('http://app.olimpiyat.com.tr:5000/');
+            socket.on('data', function(dataObj) {
+                var data = dataObj.data;
+                $('#txt').append(data);
+                document.getElementById('txt').scrollTop = document.getElementById('txt').scrollHeight;
+            });
+
+            $('#inp').on('keydown', function(e) {
+                if (e.keyCode === 13) {
+                    socket.emit('data', JSON.stringify({
+                        'imei': $('#device-imei').val(),
+                        'command': $('#inp').val()
+                    }));
+                    $('#inp').val('');
+                }
+            });
+        });
+    </script>
+</head>
+
+<body bgcolor="black">
+    <input type="text" style="height: 20px; width: 100%" id="device-imei" placeholder="Device IMEI">
+    <textarea id="txt" readonly rows=40 style="height: 50%; width: 100%"></textarea><br/> => <input type="text" id="inp" style="width: 100%" ;/>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="widthdevice-width=, initial-scale=1.0">
+    <title>Document</title>
+
+
+<script type='text/javascript'>
+    // Host we are connecting to
+    var host = '185.149.103.78'; 
+    // Port we are connecting on
+    var port = 5000;
+
+    var socket = new jSocket();
+
+    // When the socket is added the to document 
+    socket.onReady = function(){
+            socket.connect(host, port);             
+    }
+
+    // Connection attempt finished
+    socket.onConnect = function(success, msg){
+            if(success){
+                    // Send something to the socket
+                    socket.write('Hello world');            
+            }else{
+                    alert('Connection to the server could not be estabilished: ' + msg);            
+            }       
+    }
+    socket.onData = function(data){
+            alert('Received from socket: '+data);   
+    }
+
+    // Setup our socket in the div with the id="socket"
+    socket.setup('mySocket');       
+</script>
+</head>
+<body>
+    
+</body>
+</html>

@@ -1,7 +1,32 @@
-<?php 
-$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-if(!is_resource($socket)) onSocketFailure("Failed to create socket");
-socket_connect($socket, "185.149.103.78", 1988)
-        or onSocketFailure("Failed to connect to 185.149.103.78:1984", $socket);
-        socket_write($socket, "test");
- ?>
+<?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+    set_time_limit(3);
+
+    $fp = stream_socket_client("tcp://185.149.103.78:5000", $errno, $errstr);
+    if (!$fp) {
+    echo "HATA: $errno - $errstr<br />\n";
+    } else {
+    
+            $length = 14;
+            if(isset($_GET['l'])) {
+                    $length = $_GET['l'];
+            }
+            
+            fwrite($fp, '{"imei":"'.$_GET['imei'] . '","command":"' . $_GET['command'] . '"}');
+            try {
+                echo implode(unpack("H*", fread($fp, $length)));
+                fclose($fp);
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
+
+            usleep(500);
+            
+        
+            
+    }
+
+
+
+?>

@@ -30,7 +30,9 @@ net.createServer(function(socket) {
   let count = Object.keys(client_ips).length;
   console.log(socket.name);
   // Send a nice welcome message and announce
-  socket.write("Olimpiyat - Truncgil IOT TCP/Server v1.0");
+ // var num = "0103210500019E37";
+ // socket.write(num.toString(16).toUpperCase());
+  //socket.write("Olimpiyat - Truncgil IOT TCP/Server v1.0");
   //console.log(count + " cihaz bağlı");
 
 
@@ -39,44 +41,60 @@ net.createServer(function(socket) {
 
   
   var message = '';
+  var private_control = false;
+  let client_id;
   // Handle incoming messages from clients.
   socket.on('data', function(data) {
-
     // copy incoming data to message
-    message += data
+    console.log(data);
+    broadcast(data, socket);
+    message += data;
     var n = message.indexOf('\n');
+    /*
     if(message.length==12) {
         client_ids[message] = socket;
         console.log("Client ID Login: " + message);
+        socket.write("Welcome " + message + " register success");
+        
     } else {
-        console.log("client send: " + message + "\n");
+      //broadcast(message,socket);
+       // console.log("client send: " + message + "\n");
     }
+    */
     
-   
+  
     // if we have a \n? in message then emit one or more 'line' events
-    var is_private = message.indexOf('::');
-    //console.log(is_private);
-    if(is_private!=-1) {
-        let split = message.split('::');
-        let client_id = split[0];
-        let private_message = split[1].trim(); 
+   // broadcast(message,socket);
+   
+    
+    /*
+    var is_private = message.indexOf('00 00 00');
+     //console.log(is_private);
+   if(is_private!=-1) {
+        private_control = true;
+        let split = message.split('00 00 00');
+        console.log("split"+ split);
+        client_id = split[0];
+        private_message = split[1].trim(); 
         let sender = socket;
         console.log("client_id: " + client_id);
         console.log("register_code: " + private_message);
         try {
             let private_message_hex = ascii_to_hex(private_message);
-            console.log(private_message_hex);
+           // console.log(private_message_hex);
+         //   broadcast(private_message,sender);
             let sonuc = client_ids[client_id].write(private_message);
-            console.log("send: " + client_id);
+            console.log(sonuc);
             var yanit = '';
             client_ids[client_id].on('data',function(data){
-                console.log("reply: ");
-                yanit = data;
+                console.log("reply from: " + client_id);
+                yanit += data;
                 console.log(yanit);
                 sender.write(yanit);
+                yanit = '';
             });
             client_ids[client_id].on('error',function(err){
-              console.log(err);
+              console.log("error" + err);
               
             });
         } catch (error) {
@@ -87,42 +105,96 @@ net.createServer(function(socket) {
         }
         
     }
-    /*
-     socket.emit('line', message.substring(0, n))
+    */
+    
+    
+   // message = '';
+    
+     socket.emit('line', message)
       message = message.substring(n + 1)
       n = message.indexOf('\n')
-     // console.log(n);
+    //  console.log(n);
     
       
     while (~n) {
-      socket.emit('line', message.substring(0, n))
-      message = message.substring(n + 1)
+      socket.emit('line', message)
+      //message = message.substring(n + 1)
       n = message.indexOf('\n')
       console.log("line");
       console.log(n);
     }
-    */
+    
+    
   });
 
   // Broadcast on end of line
+  
   socket.on('line', function() {
-   // broadcast(socket.name + "> " + message, socket);
+    /*
+      var is_private = message.indexOf('::');
+      
+      if(is_private!=-1) {
+          private_control = true;
+          let split = message.split('::');
+          client_id = split[0];
+          private_message = split[1].trim(); 
+          let sender = socket;
+          console.log("client_id: " + client_id);
+          console.log("register_code: " + private_message);
+          try {
+              let private_message_hex = ascii_to_hex(private_message);
+              let sonuc = client_ids[client_id].write(private_message);
+              console.log(sonuc);
+              var yanit = '';
+              client_ids[client_id].on('data',function(data){
+                  console.log("reply from: " + client_id);
+                  yanit += data;
+                  console.log(yanit);
+                  sender.write(yanit);
+                  yanit = '';
+              });
+              client_ids[client_id].on('error',function(err){
+                console.log("error" + err);
+                
+              });
+          } catch (error) {
+              var error_message = "\nSend Error: " + client_id + '\n';
+              console.error(error_message);
+              console.error(error);
+              sender.write(error_message);
+          }
+          
+      }
+    */
+  //  broadcast(data, socket);
     message = '';
   })
+  
 
-  // Remove the client from the list when it leaves
   socket.on('end', function() {
     clients.splice(clients.indexOf(socket), 1);
    // broadcast("\n\r" + socket.name + " left the chat." + "\n\r");
+    console.log("\n\r" + socket.name + " left the chat." + "\n\r");
   });
+  
 
   // Send a message to all clients
-  function broadcast(message, sender) {
-    clients.forEach(function(client) {
-      // Don't want to send it to sender
-      if (client === sender) return;
-      client.write(message);
-    });
+  function broadcast(data, sender) {
+    try {
+      clients.forEach(function(client) {
+
+           // console.log(socket.name +" send message: " + data);
+            client.write(data);
+            client.on('data',function(data) {
+              console.log(data);
+            });
+        
+      });
+    } catch (error) {
+          
+    }
+      
+   
     // Log it to the server output too
     process.stdout.write(message)
   }
