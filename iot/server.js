@@ -4,9 +4,10 @@ var net = require('net');
 const axios = require('axios');
 const port = 5000;
 
-require('events').EventEmitter.prototype._maxListeners = 0;
-require('events').EventEmitter.prototype.defaultMaxListeners  = 0;
-require('events').EventEmitter.prototype.setMaxListeners = 0;//.setMaxListeners(0);
+require('events').EventEmitter.prototype._maxListeners = 1000;
+require('events').EventEmitter.prototype.defaultMaxListeners  = 1000;
+
+//require('events').EventEmitter.prototype.setMaxListeners = 0;//.setMaxListeners(0);
 
 
 var clients = [];
@@ -76,14 +77,14 @@ net.createServer(function(socket) {
                                 
                                 if (!socket.destroyed) {
                                     console.log("reply timeout");
-                                    console.log("deleting device");
+                                  //  console.log("deleting device");
                                     socket.write("0");
-                                    delete clients[imei];
+                                  //  delete clients[imei];
                                 } else {
-                                    //delete clients[imei];
+                                  //  delete clients[imei];
                                 }
 
-                            //    delete clients[imei];
+                               // delete clients[imei];
                                 clearInterval(timeoutSay);
                             }
                         }, 1000);
@@ -91,6 +92,7 @@ net.createServer(function(socket) {
                 }
                 
         } catch (error) {
+            console.log(error);
             socket.write("");
         }
                 
@@ -103,6 +105,7 @@ net.createServer(function(socket) {
         try {
             item = JSON.parse(item);
         } catch (e) {
+            console.log(e);
             return false;
         }
     
@@ -118,6 +121,7 @@ net.createServer(function(socket) {
     }
 
     socket.on('data', function(data) {
+        console.log(data);
         var isJson =  data.indexOf('{');
         if(isJson!=-1) {
             console.log("json data send");
@@ -127,7 +131,7 @@ net.createServer(function(socket) {
             try {
                 device = JSON.parse(data.toString());
             } catch (error) {
-                
+                console.log(error);
             }
 
             if(device!=0) {
@@ -250,11 +254,13 @@ net.createServer(function(socket) {
         if (imei !== '') {
 
             if(imei.length==12) {
+                /*
                 try {
                     clients[imei].close();
                 } catch (error) {
-                    
+                    console.log(error);
                 }
+                */
                 setTimeout(function() {
                     clients[imei] = socket;
                     //socket.imei = imei;
